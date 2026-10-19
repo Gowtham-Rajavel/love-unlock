@@ -23,7 +23,8 @@ body{background:radial-gradient(120% 90% at 50% 0%,var(--felt),var(--felt-deep))
   font-family:var(--hand);padding-inline:16px;padding-block:24px 32px;display:flex;flex-direction:column;align-items:center;gap:20px;overflow-x:hidden}
 .card{width:min(100%,460px);aspect-ratio:4/5;background:var(--paper);position:relative;container-type:inline-size;
   border-radius:3px;box-shadow:0 18px 40px rgba(0,0,0,.35),0 2px 0 rgba(255,255,255,.4) inset;transform:rotate(-1.2deg);overflow:hidden}
-.gl{display:inline-block;position:relative;isolation:isolate;font-family:var(--display);font-weight:800;line-height:1;color:transparent;
+.gl{display:inline-block;position:relative;font-family:var(--display);font-weight:800;line-height:1;color:var(--red);-webkit-text-stroke:.14em var(--red)}
+.gl::after{content:attr(data-t);position:absolute;left:0;top:0;color:transparent;-webkit-text-stroke:0;
   background:
     radial-gradient(circle at 20% 30%,#fff 0 .6px,transparent 1.2px),
     radial-gradient(circle at 70% 60%,#fff 0 .6px,transparent 1.2px),
@@ -31,7 +32,6 @@ body{background:radial-gradient(120% 90% at 50% 0%,var(--felt),var(--felt-deep))
     linear-gradient(135deg,#e6e8eb,var(--silver) 45%,#9a9da4 70%,#d8dadd);
   background-size:7px 7px,9px 9px,6px 6px,100% 100%;
   -webkit-background-clip:text;background-clip:text}
-.gl::before{content:attr(data-t);position:absolute;inset:0;z-index:-1;color:var(--red);-webkit-text-stroke:.16em var(--red)}
 .top{position:absolute;left:0;right:0;top:3%;height:17%}
 .top .gl{position:absolute;font-size:17cqw;top:0;transform:translateX(-50%);transition:filter .6s,opacity .6s,transform .6s}
 .top .gl.locked{filter:grayscale(1) brightness(.85);opacity:.45}
@@ -69,7 +69,7 @@ button.pulse{animation:pulse 1.8s infinite}
 @media (prefers-reduced-motion:reduce){*{animation-duration:.01s!important;animation-delay:0s!important;transition-duration:.01s!important}}
 
 #reveal{position:fixed;inset:0;z-index:10;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:16px;
-  background:radial-gradient(120% 90% at 50% 40%,rgba(179,38,30,.0),rgba(110,16,12,.96));opacity:0;visibility:hidden;transition:opacity .8s,visibility 0s .8s}
+  background:radial-gradient(120% 90% at 50% 40%,#b3261e,#6e100c);opacity:0;visibility:hidden;transition:opacity .8s,visibility 0s .8s}
 #reveal.on{opacity:1;visibility:visible;transition:opacity .8s}
 .bigheart{position:absolute;font-size:30vmin;color:#fff;line-height:1;transform:scale(0);opacity:0}
 #reveal.on .bigheart{animation:bigpop 1.6s ease-out forwards}
@@ -78,7 +78,7 @@ button.pulse{animation:pulse 1.8s infinite}
 #reveal.on .hp{animation:hpin 1.4s 1.2s cubic-bezier(.2,1.4,.4,1) forwards,beat 1.6s 2.8s ease-in-out infinite}
 @keyframes hpin{0%{transform:scale(0) rotate(-14deg);opacity:0}100%{transform:scale(1) rotate(0);opacity:1}}
 @keyframes beat{0%,100%{transform:scale(1)}12%{transform:scale(1.05)}24%{transform:scale(1)}36%{transform:scale(1.04)}48%{transform:scale(1)}}
-.hp img{width:100%;height:100%;object-fit:cover;object-position:50% 30%;clip-path:url(#hc);display:block}
+.hp img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 30%;clip-path:url(#hc);display:block}
 .cap{color:#fff;font-size:clamp(20px,5.4vw,28px);text-align:center;opacity:0;transform:translateY(10px)}
 #reveal.on .cap{animation:rise .8s 2.4s forwards}
 #reveal button{opacity:0}
