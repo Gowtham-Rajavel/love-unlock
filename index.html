@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>LOVE Unlock</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@800&family=Patrick+Hand&display=swap">
+<style>
+/* Layout: a paper card on red felt; LOVE across the top, four ink lines drop down to stair-stepped words (L lowest, E highest) */
+:root{
+  --felt:#b3261e;
+  --felt-deep:#8f1c16;
+  --paper:#eef0f3;
+  --ink:#16171a;
+  --red:#e0242a;
+  --silver:#c4c7cc;
+  --display:"Baloo 2","Arial Rounded MT Bold",system-ui,sans-serif;
+  --hand:"Patrick Hand","Comic Sans MS",cursive,sans-serif;
+  color-scheme:light;
+}
+html,body{min-height:100%}
+body{background:radial-gradient(120% 90% at 50% 0%,var(--felt),var(--felt-deep));color:var(--ink);
+  font-family:var(--hand);padding-inline:16px;padding-block:24px 32px;display:flex;flex-direction:column;align-items:center;gap:20px;overflow-x:hidden}
+.card{width:min(100%,460px);aspect-ratio:4/5;background:var(--paper);position:relative;container-type:inline-size;
+  border-radius:3px;box-shadow:0 18px 40px rgba(0,0,0,.35),0 2px 0 rgba(255,255,255,.4) inset;transform:rotate(-1.2deg);overflow:hidden}
+.gl{display:inline-block;position:relative;isolation:isolate;font-family:var(--display);font-weight:800;line-height:1;color:transparent;
+  background:
+    radial-gradient(circle at 20% 30%,#fff 0 .6px,transparent 1.2px),
+    radial-gradient(circle at 70% 60%,#fff 0 .6px,transparent 1.2px),
+    radial-gradient(circle at 45% 85%,#8d9097 0 .7px,transparent 1.3px),
+    linear-gradient(135deg,#e6e8eb,var(--silver) 45%,#9a9da4 70%,#d8dadd);
+  background-size:7px 7px,9px 9px,6px 6px,100% 100%;
+  -webkit-background-clip:text;background-clip:text}
+.gl::before{content:attr(data-t);position:absolute;inset:0;z-index:-1;color:var(--red);-webkit-text-stroke:.16em var(--red)}
+.top{position:absolute;left:0;right:0;top:3%;height:17%}
+.top .gl{position:absolute;font-size:17cqw;top:0;transform:translateX(-50%);transition:filter .6s,opacity .6s,transform .6s}
+.top .gl.locked{filter:grayscale(1) brightness(.85);opacity:.45}
+.top .gl.on{animation:pop .7s cubic-bezier(.3,1.6,.5,1)}
+.lock{position:absolute;top:100%;font-size:4.2cqw;transform:translate(-50%,-2cqw);opacity:.55;transition:opacity .3s}
+.lock.gone{opacity:0}
+.line{position:absolute;top:25%;width:1.4cqw;margin-left:-.7cqw;background:var(--ink);border-radius:1cqw;transform:scaleY(0);transform-origin:top;transition:transform .9s cubic-bezier(.6,.05,.2,1)}
+.line.on{transform:scaleY(1)}
+.word{position:absolute;display:flex;align-items:baseline;font-size:7.4cqw;white-space:nowrap;pointer-events:none}
+.word .gl{font-size:1.9em;margin-right:.02em;opacity:0;transform:scale(.2) rotate(-12deg)}
+.word.on .gl{animation:pop .7s .75s cubic-bezier(.3,1.6,.5,1) forwards}
+.word .rest span{display:inline-block;opacity:0;transform:translateY(.4em)}
+.word.on .rest span{animation:rise .35s forwards}
+@keyframes pop{0%{transform:scale(.2) rotate(-12deg);opacity:0}100%{transform:scale(1) rotate(0);opacity:1}}
+@keyframes rise{to{opacity:1;transform:none}}
+.glow{position:absolute;inset:0;pointer-events:none;opacity:0;background:radial-gradient(60% 40% at var(--gx,50%) 20%,rgba(224,36,42,.22),transparent 70%)}
+.glow.flash{animation:flash 1s}
+@keyframes flash{0%{opacity:1}100%{opacity:0}}
+.final{position:absolute;left:0;right:0;bottom:2.5%;text-align:center;font-size:5cqw;opacity:0;transition:opacity 1s}
+.final.on{opacity:1}
+.panel{width:min(100%,460px);display:flex;flex-direction:column;align-items:center;gap:12px}
+.dots{display:flex;gap:10px}
+.dots i{width:12px;height:12px;border-radius:50%;background:rgba(255,255,255,.3);transition:background .4s,transform .4s}
+.dots i.on{background:#fff;transform:scale(1.25)}
+button{font:inherit;font-size:22px;letter-spacing:.02em;color:var(--felt-deep);background:var(--paper);border:0;border-radius:999px;padding:12px 34px;cursor:pointer;
+  box-shadow:0 6px 0 rgba(0,0,0,.28);transition:transform .12s,box-shadow .12s}
+button:hover{transform:translateY(-1px)}
+button:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.28)}
+button:focus-visible{outline:3px solid #fff;outline-offset:4px}
+button.pulse{animation:pulse 1.8s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 6px 0 rgba(0,0,0,.28),0 0 0 0 rgba(255,255,255,.55)}50%{box-shadow:0 6px 0 rgba(0,0,0,.28),0 0 0 14px rgba(255,255,255,0)}}
+.hint{color:rgba(255,255,255,.85);font-size:18px;text-align:center;min-height:1.3em}
+.heart{position:fixed;bottom:-30px;pointer-events:none;color:#fff;animation:float linear forwards;z-index:5}
+@keyframes float{to{transform:translateY(-110vh) rotate(40deg);opacity:0}}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01s!important;animation-delay:0s!important;transition-duration:.01s!important}}
+</style>
+
+</head>
+<body>
+<div class="card" id="card">
+  <div class="top" id="top"></div>
+  <div class="glow" id="glow"></div>
+  <div class="final" id="final">Love you. Only you. Very much. Everytime.</div>
+</div>
+<div class="panel">
+  <div class="dots" id="dots" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+  <button id="next" class="pulse" type="button">Next</button>
+  <div class="hint" id="hint" aria-live="polite">Tap Next to unlock the first letter</div>
+</div>
+
+<script>
+(function(){
+  // E is the last letter and the first word to read at the top, L the first word to unlock at the bottom
+  var items=[
+    {l:"L",rest:"ove you",x:8,row:84,hint:"L is for… Love you"},
+    {l:"O",rest:"nly you",x:27,row:68,hint:"O is for… Only you"},
+    {l:"V",rest:"ery much",x:45,row:52,hint:"V is for… Very much"},
+    {l:"E",rest:"verytime",x:62,row:36,hint:"E is for… Everytime"}
+  ];
+  var tx=[13,36,58,80]; // top letter centres, % of card
+  var card=document.getElementById("card"),top=document.getElementById("top"),
+      glow=document.getElementById("glow"),fin=document.getElementById("final"),
+      next=document.getElementById("next"),hint=document.getElementById("hint"),
+      dots=document.querySelectorAll("#dots i");
+  var tops=[],lines=[],words=[],locks=[],step=0;
+
+  "LOVE".split("").forEach(function(c,i){
+    var s=document.createElement("span");s.className="gl locked";s.textContent=c;s.dataset.t=c;s.style.left=tx[i]+"%";top.appendChild(s);tops.push(s);
+    var k=document.createElement("span");k.className="lock";k.textContent="🔒";k.style.left=tx[i]+"%";top.appendChild(k);locks.push(k);
+  });
+  items.forEach(function(it,i){
+    var ln=document.createElement("div");ln.className="line";ln.style.left=it.x+"%";
+    ln.style.height=(it.row-25)+"%";card.appendChild(ln);lines.push(ln);
+    var w=document.createElement("div");w.className="word";w.style.left="calc("+it.x+"% - 4.2cqw)";w.style.top=(it.row-1)+"%";
+    var g=document.createElement("span");g.className="gl";g.textContent=it.l;g.dataset.t=it.l;w.appendChild(g);
+    var r=document.createElement("span");r.className="rest";
+    it.rest.split("").forEach(function(ch,j){var s=document.createElement("span");s.textContent=ch===" "?" ":ch;s.style.animationDelay=(1.15+j*.07)+"s";r.appendChild(s)});
+    w.appendChild(r);card.appendChild(w);words.push(w);
+  });
+
+  function hearts(n){
+    for(var i=0;i<n;i++){
+      var h=document.createElement("div");h.className="heart";h.textContent="♥";
+      h.style.left=Math.random()*100+"vw";h.style.fontSize=(14+Math.random()*26)+"px";
+      h.style.animationDuration=(3+Math.random()*3)+"s";h.style.animationDelay=(Math.random()*.8)+"s";
+      document.body.appendChild(h);setTimeout(function(e){e.remove()},7500,h);
+    }
+  }
+
+  function advance(){
+    if(step>=4){reset();return}
+    var i=step;
+    tops[i].classList.remove("locked");tops[i].classList.add("on");locks[i].classList.add("gone");
+    lines[i].classList.add("on");words[i].classList.add("on");
+    glow.style.setProperty("--gx",tx[i]+"%");glow.classList.remove("flash");void glow.offsetWidth;glow.classList.add("flash");
+    dots[i].classList.add("on");hearts(6+i*4);
+    hint.textContent=items[i].hint;
+    step++;
+    if(step<4){next.textContent="Next";next.classList.add("pulse");}
+    else{next.textContent="Play again";next.classList.remove("pulse");
+      setTimeout(function(){fin.classList.add("on");hearts(40);hint.textContent="LOVE: Love you, Only you, Very much, Everytime."},1900);}
+  }
+  function reset(){
+    tops.forEach(function(t){t.classList.remove("on");t.classList.add("locked")});
+    locks.forEach(function(k){k.classList.remove("gone")});
+    lines.forEach(function(l){l.classList.remove("on")});
+    words.forEach(function(w){w.classList.remove("on")});
+    dots.forEach(function(d){d.classList.remove("on")});
+    fin.classList.remove("on");step=0;next.textContent="Next";next.classList.add("pulse");
+    hint.textContent="Tap Next to unlock the first letter";
+  }
+  next.addEventListener("click",advance);
+})();
+</script>
+
+</body></html>
