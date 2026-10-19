@@ -67,6 +67,24 @@ button.pulse{animation:pulse 1.8s infinite}
 .heart{position:fixed;bottom:-30px;pointer-events:none;color:#fff;animation:float linear forwards;z-index:5}
 @keyframes float{to{transform:translateY(-110vh) rotate(40deg);opacity:0}}
 @media (prefers-reduced-motion:reduce){*{animation-duration:.01s!important;animation-delay:0s!important;transition-duration:.01s!important}}
+
+#reveal{position:fixed;inset:0;z-index:10;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:16px;
+  background:radial-gradient(120% 90% at 50% 40%,rgba(179,38,30,.0),rgba(110,16,12,.96));opacity:0;visibility:hidden;transition:opacity .8s,visibility 0s .8s}
+#reveal.on{opacity:1;visibility:visible;transition:opacity .8s}
+.bigheart{position:absolute;font-size:30vmin;color:#fff;line-height:1;transform:scale(0);opacity:0}
+#reveal.on .bigheart{animation:bigpop 1.6s ease-out forwards}
+@keyframes bigpop{0%{transform:scale(0);opacity:0}35%{transform:scale(1.4);opacity:1}60%{transform:scale(1);opacity:1}100%{transform:scale(14);opacity:0}}
+.hp{width:min(84vw,56vh,440px);aspect-ratio:1;position:relative;transform:scale(0);opacity:0}
+#reveal.on .hp{animation:hpin 1.4s 1.2s cubic-bezier(.2,1.4,.4,1) forwards,beat 1.6s 2.8s ease-in-out infinite}
+@keyframes hpin{0%{transform:scale(0) rotate(-14deg);opacity:0}100%{transform:scale(1) rotate(0);opacity:1}}
+@keyframes beat{0%,100%{transform:scale(1)}12%{transform:scale(1.05)}24%{transform:scale(1)}36%{transform:scale(1.04)}48%{transform:scale(1)}}
+.hp img{width:100%;height:100%;object-fit:cover;object-position:50% 30%;clip-path:url(#hc);display:block}
+.cap{color:#fff;font-size:clamp(20px,5.4vw,28px);text-align:center;opacity:0;transform:translateY(10px)}
+#reveal.on .cap{animation:rise .8s 2.4s forwards}
+#reveal button{opacity:0}
+#reveal.on button{animation:rise .6s 3.2s forwards}
+.burst{position:fixed;left:50%;top:50%;color:#fff;pointer-events:none;z-index:11;animation:burst 2.2s ease-out forwards}
+@keyframes burst{0%{transform:translate(-50%,-50%) scale(.3);opacity:1}100%{transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(1) rotate(var(--r));opacity:0}}
 </style>
 
 </head>
@@ -82,6 +100,13 @@ button.pulse{animation:pulse 1.8s infinite}
   <div class="hint" id="hint" aria-live="polite">Tap Next to unlock the first letter</div>
 </div>
 
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><clipPath id="hc" clipPathUnits="objectBoundingBox"><path d="M0.5,0.97 C0.08,0.66 -0.02,0.44 0.02,0.27 C0.06,0.07 0.3,-0.04 0.5,0.17 C0.7,-0.04 0.94,0.07 0.98,0.27 C1.02,0.44 0.92,0.66 0.5,0.97 Z"/></clipPath></svg>
+<div id="reveal" aria-live="polite">
+  <div class="bigheart" aria-hidden="true">♥</div>
+  <div class="hp"><img src="photo.png" alt="Us together"></div>
+  <div class="cap">Love you. Only you. Very much. Everytime.</div>
+  <button id="again" type="button">Play again</button>
+</div>
 <script>
 (function(){
   // E is the last letter and the first word to read at the top, L the first word to unlock at the bottom
@@ -132,9 +157,22 @@ button.pulse{animation:pulse 1.8s infinite}
     step++;
     if(step<4){next.textContent="Next";next.classList.add("pulse");}
     else{next.textContent="Play again";next.classList.remove("pulse");
-      setTimeout(function(){fin.classList.add("on");hearts(40);hint.textContent="LOVE: Love you, Only you, Very much, Everytime."},1900);}
+      setTimeout(function(){fin.classList.add("on");hearts(40);hint.textContent="LOVE: Love you, Only you, Very much, Everytime."},1900);
+      setTimeout(showReveal,3800);}
+  }
+  function showReveal(){
+    var rv=document.getElementById("reveal");rv.classList.add("on");
+    for(var i=0;i<70;i++){
+      var h=document.createElement("div");h.className="burst";h.textContent="♥";
+      var a=Math.random()*6.283,d=120+Math.random()*Math.max(innerWidth,innerHeight)*.6;
+      h.style.setProperty("--dx",Math.cos(a)*d+"px");h.style.setProperty("--dy",Math.sin(a)*d+"px");h.style.setProperty("--r",(Math.random()*120-60)+"deg");
+      h.style.fontSize=(16+Math.random()*34)+"px";h.style.animationDelay=(.5+Math.random()*1.2)+"s";
+      document.body.appendChild(h);setTimeout(function(e){e.remove()},4500,h);
+    }
+    setTimeout(function(){hearts(30)},1500);
   }
   function reset(){
+    document.getElementById("reveal").classList.remove("on");
     tops.forEach(function(t){t.classList.remove("on");t.classList.add("locked")});
     locks.forEach(function(k){k.classList.remove("gone")});
     lines.forEach(function(l){l.classList.remove("on")});
@@ -144,6 +182,7 @@ button.pulse{animation:pulse 1.8s infinite}
     hint.textContent="Tap Next to unlock the first letter";
   }
   next.addEventListener("click",advance);
+  document.getElementById("again").addEventListener("click",reset);
 })();
 </script>
 
